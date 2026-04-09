@@ -45,5 +45,5 @@ jobs:
                   context: .
                   push: true
                   tags: |
-                      tonpseudo/mailer:latest
-                      tonpseudo/mailer:${{ github.sha }}
+                      yassineddev/mailer:latest
+                      yassineddev/mailer:${{ github.sha }}
