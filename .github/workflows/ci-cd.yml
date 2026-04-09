@@ -58,7 +58,7 @@ jobs:
                   password: ${{ secrets.DOCKERHUB_TOKEN }}
 
             - name: Build Docker image
-              run: docker build -t yassineddev/mailerlatest .
+              run: docker build -t yassineddev/mailer:latest .
 
             - name: Push Docker image
               run: docker push yassineddev/mailer:latest
