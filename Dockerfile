@@ -36,7 +36,8 @@ RUN apt-get update && apt-get install -y \
  && docker-php-ext-install pdo pdo_mysql intl zip \
  && rm -rf /var/lib/apt/lists/*
 RUN a2enmod rewrite
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+# COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+COPY composer.json composer.lock ./
 WORKDIR /var/www/html
 COPY . .
 RUN composer install --no-dev --optimize-autoloader
