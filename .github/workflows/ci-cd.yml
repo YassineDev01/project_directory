@@ -1,8 +1,13 @@
-on: [push, pull_request]
+name: Symfony CI/CD
+
+on:
+    push:
+        branches: ["main"]
 
 jobs:
     build-and-test:
         runs-on: ubuntu-latest
+
         services:
             mysql:
                 image: mysql:8.0
@@ -11,39 +16,49 @@ jobs:
                     MYSQL_DATABASE: test
                     MYSQL_USER: test
                     MYSQL_PASSWORD: test
-                ports: ["3306:3306"]
+                ports:
+                    - 3306:3306
+                options: >-
+                    --health-cmd="mysqladmin ping -h localhost"
+                    --health-interval=10s
+                    --health-timeout=5s
+                    --health-retries=3
+
             mailhog:
                 image: mailhog/mailhog
-                ports: ["1025:1025", "8025:8025"]
+                ports:
+                    - 1025:1025
+                    - 8025:8025
 
         steps:
             - uses: actions/checkout@v4
-            - uses: shivammathur/setup-php@v2
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
               with:
                   php-version: "8.3"
-                  extensions: pdo_mysql, intl
 
-            - run: composer install --no-interaction --prefer-dist
+            - name: Install dependencies
+              run: composer install --no-interaction --prefer-dist
 
             - name: Run tests
-              env:
-                  DATABASE_URL: "mysql://test:test@127.0.0.1:3306/test"
-                  MAILER_DSN: "smtp://localhost:1025"
               run: php bin/phpunit --testdox
 
     docker-build-push:
         runs-on: ubuntu-latest
         needs: build-and-test
+
         steps:
             - uses: actions/checkout@v4
-            - uses: docker/login-action@v3
+
+            - name: Log in to Docker Hub
+              uses: docker/login-action@v3
               with:
                   username: ${{ secrets.DOCKERHUB_USERNAME }}
                   password: ${{ secrets.DOCKERHUB_TOKEN }}
-            - uses: docker/build-push-action@v5
-              with:
-                  context: .
-                  push: true
-                  tags: |
-                      ${{ secrets.DOCKERHUB_USERNAME }}/mailer:latest
-                      ${{ secrets.DOCKERHUB_USERNAME }}/mailer:${{ github.sha }}
+
+            - name: Build Docker image
+              run: docker build -t yassineddev/mailerlatest .
+
+            - name: Push Docker image
+              run: docker push yassineddev/mailer:latest
