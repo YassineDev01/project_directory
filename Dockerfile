@@ -19,7 +19,7 @@ WORKDIR /var/www/html
 COPY composer.json composer.lock ./
 
 # Installer les dépendances PHP sans utiliser root
-RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+RUN composer install --no-dev --optimize-autoloader --no-interaction 
 
 # Copier le reste du projet
 COPY . .
