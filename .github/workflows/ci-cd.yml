@@ -45,5 +45,5 @@ jobs:
                   context: .
                   push: true
                   tags: |
-                      yassineddev/mailer:latest
-                      yassineddev/mailer:${{ github.sha }}
+                      ${{ secrets.DOCKERHUB_USERNAME }}/mailer:latest
+                      ${{ secrets.DOCKERHUB_USERNAME }}/mailer:${{ github.sha }}
